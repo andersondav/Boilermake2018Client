@@ -1,4 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+
+final GoogleSignIn _googleSignIn = GoogleSignIn();
+final FirebaseAuth _auth = FirebaseAuth.instance;
+final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
 
 void main() => runApp(new MyApp());
 
@@ -9,9 +17,7 @@ class MyApp extends StatelessWidget {
     return new MaterialApp(
       title: 'Flutter Demo',
       theme: new ThemeData(
-        primarySwatch: Colors.blue,
-        backgroundColor: Colors.black54
-      ),
+          primarySwatch: Colors.blue, backgroundColor: Colors.black54),
       home: new MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
@@ -27,17 +33,12 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
+  void _askingForHelp() {
+    print("TODO: insert transition to list of helpers");
+    Firestore.instance.collection('helpers').snapshots().forEach(
+        (QuerySnapshot a) => a.documents
+            .toList()
+            .forEach((DocumentSnapshot a) => print(a.data["name"])));
   }
 
   @override
@@ -65,7 +66,8 @@ class _MyHomePageState extends State<MyHomePage> {
             ButtonTheme(
               minWidth: 200.0,
               height: 100.0,
-              child: initialOptions(text: 'Looking for help', redirScreen: new LookerScreen()),
+              child: initialOptions(
+                  text: 'Looking for help', redirScreen: new LookerScreen()),
             ),
             new Container(
               height: 20.0,
@@ -73,8 +75,8 @@ class _MyHomePageState extends State<MyHomePage> {
             ButtonTheme(
               minWidth: 200.0,
               height: 100.0,
-
-              child: initialOptions(text: 'Offering help', redirScreen: new HelperScreen()),
+              child: initialOptions(
+                  text: 'Offering help', redirScreen: new HelperScreen()),
             ),
             // ignore: argument_type_not_assignable
           ],
@@ -104,19 +106,16 @@ class initialOptions extends RaisedButton {
     } else {
       this.buttonColor = Colors.blue;
     }
-
   }
 
   Widget build(BuildContext context) {
     _setColor();
     return new RaisedButton(
-        child: Text(
-            this.text,
-          style: new TextStyle(
-            fontSize: 30.0,
-            color: Colors.black54,
-          )
-        ),
+        child: Text(this.text,
+            style: new TextStyle(
+              fontSize: 30.0,
+              color: Colors.black54,
+            )),
         color: this.buttonColor,
         elevation: 4.0,
         splashColor: Colors.blueGrey,
@@ -125,8 +124,7 @@ class initialOptions extends RaisedButton {
             context,
             MaterialPageRoute(builder: (context) => this.redirScreen),
           );
-        }
-    );
+        });
   }
 }
 
@@ -137,15 +135,12 @@ class LookerScreen extends StatefulWidget {
 
 class _LookerScreenState extends State<LookerScreen> {
   @override
-  Widget build (BuildContext ctxt) {
+  Widget build(BuildContext ctxt) {
     return new Scaffold(
         appBar: new AppBar(
           title: new Text("Nearby Helpers"),
         ),
-        body: new Center(
-
-        )
-    );
+        body: new Center());
   }
 }
 
@@ -155,14 +150,34 @@ class HelperScreen extends StatefulWidget {
   _HelperScreenState createState() => _HelperScreenState();
 }
 
+Future<FirebaseUser> _handleSignIn() async {
+  GoogleSignInAccount googleUser = await _googleSignIn.signIn();
+  GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+  FirebaseUser user = await _auth.signInWithGoogle(
+    accessToken: googleAuth.accessToken,
+    idToken: googleAuth.idToken,
+  );
+  print("signed in " + user.displayName);
+  return user;
+}
+
 // Define a corresponding State class. This class will hold the data related to
 // our Form.
 class _HelperScreenState extends State<HelperScreen> {
+  void _sendData() {
+    _handleSignIn().then((user) {
+      // TODO: check for duplicates, and if there is one allow for editing of stuff
 
-  void _sendData(String dataToSend) {
-    print('Data sent');
-    //send data
+      // upload the credentials
+      Firestore.instance.collection('helpers').document().setData({
+        'email': user.email,
+        'name': user.displayName,
+        'skills': myController.text,
+        'location': 'TODO',
+      });
+    });
   }
+
   // Create a text controller. We will use it to retrieve the current value
   // of the TextField!
   final myController = TextEditingController();
@@ -176,9 +191,6 @@ class _HelperScreenState extends State<HelperScreen> {
 
   @override
   Widget build(BuildContext context) {
-    _sendData(String dataToSend) {
-      print('data sent');
-    }
     return new Scaffold(
       backgroundColor: Colors.deepOrangeAccent,
       appBar: new AppBar(
@@ -209,10 +221,7 @@ class _HelperScreenState extends State<HelperScreen> {
                   color: Theme.of(context).accentColor,
                   elevation: 4.0,
                   splashColor: Colors.blueGrey,
-                  onPressed: () {
-                    print('data sent');
-                  }
-              ),
+                  onPressed: _sendData),
               // ignore: argument_type_not_assignable
             ],
           ),
@@ -221,5 +230,40 @@ class _HelperScreenState extends State<HelperScreen> {
         // ignore: duplicate_named_argument
       ),
     );
+  }
+}
+
+class Messaging extends StatefulWidget {
+  @override
+  _MessagingState createState() => new _MessagingState();
+}
+
+class _MessagingState extends State<Messaging> {
+  @override
+  Widget build(BuildContext context) {
+    _firebaseMessaging.configure(
+        onMessage: (Map<String, dynamic> message) async {
+      print(message);
+    });
+
+    _firebaseMessaging.subscribeToTopic("tester");
+    print("Subscribed");
+
+    return new Scaffold(
+        appBar: new AppBar(
+          title: new Text("Messaging"),
+        ),
+        body: Column(
+          children: [
+            Row(
+              children: [Chip(label: Text("Hello"))],
+              mainAxisAlignment: MainAxisAlignment.end,
+            ),
+            Row(
+              children: [Chip(label: Text("Goodbye"))],
+              mainAxisAlignment: MainAxisAlignment.start,
+            )
+          ],
+        ));
   }
 }
