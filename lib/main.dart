@@ -66,7 +66,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ButtonTheme(
               minWidth: 200.0,
               height: 100.0,
-              child: initialOptions(
+              child: InitialOptions(
                   text: 'Looking for help',
                   handleFunc: () {
                     Navigator.push(
@@ -82,7 +82,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ButtonTheme(
               minWidth: 200.0,
               height: 100.0,
-              child: initialOptions(
+              child: InitialOptions(
                   text: 'Offering help',
                   handleFunc: () {
                     _handleSignIn().then(((user) {
@@ -110,8 +110,8 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-class initialOptions extends RaisedButton {
-  initialOptions({Key key, this.text, this.handleFunc}) : super(key: key);
+class InitialOptions extends RaisedButton {
+  InitialOptions({Key key, this.text, this.handleFunc}) : super(key: key);
 
   final String text;
 
@@ -216,7 +216,7 @@ class _HelperScreenState extends State<HelperScreen> {
                 'Please enter your areas of expertise',
                 style: new TextStyle(
                   fontSize: 20.0,
-                  color: Colors.black54,
+                  color: Color(0xAACFB53B),
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -226,7 +226,7 @@ class _HelperScreenState extends State<HelperScreen> {
               // ignore: list_element_type_not_assignable
               RaisedButton(
                   child: Text('Submit'),
-                  textColor: Colors.black54,
+                  textColor: Color(0xAACFB53B),
                   color: Theme.of(context).accentColor,
                   elevation: 4.0,
                   splashColor: Colors.blueGrey,
