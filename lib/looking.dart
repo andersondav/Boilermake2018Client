@@ -17,6 +17,7 @@ class LookerScreen extends StatelessWidget {
                 return new Text('Loading...');
               default:
                 return new ListView(
+
                   children:
                       snapshot.data.documents.map((DocumentSnapshot document) {
                     return new ListTile(
