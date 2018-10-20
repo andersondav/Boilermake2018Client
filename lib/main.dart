@@ -1,14 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
+
+import 'looking.dart';
+import 'create_acct.dart';
 
 final GoogleSignIn _googleSignIn = GoogleSignIn();
 final FirebaseAuth _auth = FirebaseAuth.instance;
-final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
 
 void main() => runApp(new MyApp());
+
+Future<FirebaseUser> _handleSignIn() async {
+  GoogleSignInAccount googleUser = await _googleSignIn.signIn();
+  GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+  FirebaseUser user = await _auth.signInWithGoogle(
+    accessToken: googleAuth.accessToken,
+    idToken: googleAuth.idToken,
+  );
+  print("signed in " + user.displayName);
+  return user;
+}
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
@@ -95,7 +107,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => new HelperScreen(
+                              builder: (context) => new AcctCreation(
                                     user: user,
                                     userdocument: document,
                                   )),
@@ -140,170 +152,5 @@ class InitialOptions extends RaisedButton {
         elevation: 4.0,
         splashColor: Colors.blueGrey,
         onPressed: handleFunc);
-  }
-}
-
-// Define a Custom Form Widget
-class HelperScreen extends StatefulWidget {
-  HelperScreen({this.user, this.userdocument});
-
-  final FirebaseUser user;
-  final DocumentSnapshot userdocument;
-
-  @override
-  _HelperScreenState createState() => _HelperScreenState();
-}
-
-Future<FirebaseUser> _handleSignIn() async {
-  GoogleSignInAccount googleUser = await _googleSignIn.signIn();
-  GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-  FirebaseUser user = await _auth.signInWithGoogle(
-    accessToken: googleAuth.accessToken,
-    idToken: googleAuth.idToken,
-  );
-  print("signed in " + user.displayName);
-  return user;
-}
-
-// Define a corresponding State class. This class will hold the data related to
-// our Form.
-class _HelperScreenState extends State<HelperScreen> {
-  void _sendData() {
-    // upload the credentials
-    Firestore.instance
-        .collection('helpers')
-        .document(this.widget.user.email.toLowerCase())
-        .setData({
-      'email': this.widget.user.email,
-      'name': this.widget.user.displayName,
-      'skills': myController.text,
-      'profile_pic': this.widget.user.photoUrl,
-      'location': 'TODO',
-    });
-  }
-
-  // Create a text controller. We will use it to retrieve the current value
-  // of the TextField!
-  final myController = TextEditingController();
-
-  @override
-  void dispose() {
-    // Clean up the controller when the Widget is disposed
-    myController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // see if they are already a user
-    bool userexists = widget.userdocument.exists;
-    if (userexists) {
-      myController.text = widget.userdocument.data['skills'];
-    }
-
-    return new Scaffold(
-        backgroundColor: Colors.black,
-        appBar: new AppBar(
-          title: new Text('Helper Data Entry'),
-        ),
-        body: new Center(
-          child: new Container(
-            padding: const EdgeInsets.all(32.0),
-            child: new Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                new Text(
-                    'You are ${this.widget.user.displayName}. ${userexists ? "Welcome Back!" : "Welcome new user!"}'),
-                new Text(
-                  'Please enter your areas of expertise',
-                  style: new TextStyle(
-                    fontSize: 20.0,
-                    color: Colors.black54,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                new TextFormField(
-                  controller: myController,
-                ),
-                // ignore: list_element_type_not_assignable
-                RaisedButton(
-                    child: Text('Submit'),
-                    textColor: Colors.black54,
-                    color: Theme.of(context).accentColor,
-                    elevation: 4.0,
-                    splashColor: Colors.blueGrey,
-                    onPressed: _sendData),
-                // ignore: argument_type_not_assignable
-              ],
-            ),
-          ),
-        ));
-  }
-}
-
-class LookerScreen extends StatelessWidget {
-  Widget build(BuildContext context) {
-    return new Scaffold(
-        appBar: new AppBar(
-          title: new Text("Nearby Helpers"),
-        ),
-        body: StreamBuilder<QuerySnapshot>(
-          stream: Firestore.instance.collection('helpers').snapshots(),
-          builder:
-              (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-            if (snapshot.hasError) return new Text('Error: ${snapshot.error}');
-            switch (snapshot.connectionState) {
-              case ConnectionState.waiting:
-                return new Text('Loading...');
-              default:
-                return new ListView(
-                  children:
-                      snapshot.data.documents.map((DocumentSnapshot document) {
-                    return new ListTile(
-                      leading: Image.network(
-                          document.data["profile_pic"] + "?sz=64"),
-                      title: new Text(document['name']),
-                      subtitle: new Text(document['skills']),
-                    );
-                  }).toList(),
-                );
-            }
-          },
-        ));
-  }
-}
-
-class Messaging extends StatefulWidget {
-  @override
-  _MessagingState createState() => new _MessagingState();
-}
-
-class _MessagingState extends State<Messaging> {
-  @override
-  Widget build(BuildContext context) {
-    _firebaseMessaging.configure(
-        onMessage: (Map<String, dynamic> message) async {
-      print(message);
-    });
-
-    _firebaseMessaging.subscribeToTopic("tester");
-    print("Subscribed");
-
-    return new Scaffold(
-        appBar: new AppBar(
-          title: new Text("Messaging"),
-        ),
-        body: Column(
-          children: [
-            Row(
-              children: [Chip(label: Text("Hello"))],
-              mainAxisAlignment: MainAxisAlignment.end,
-            ),
-            Row(
-              children: [Chip(label: Text("Goodbye"))],
-              mainAxisAlignment: MainAxisAlignment.start,
-            )
-          ],
-        ));
   }
 }
