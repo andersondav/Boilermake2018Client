@@ -176,6 +176,7 @@ class _HelperScreenState extends State<HelperScreen> {
       'email': this.widget.user.email,
       'name': this.widget.user.displayName,
       'skills': myController.text,
+      'profile_pic': this.widget.user.photoUrl,
       'location': 'TODO',
     });
   }
@@ -239,44 +240,35 @@ class _HelperScreenState extends State<HelperScreen> {
   }
 }
 
-class Helper {
-  Helper({this.name, this.email});
-
-  String name;
-  String email;
-  String bio;
-
-}
-
-
-List<Helper> helpers = [
-  Helper(name: "Prajesh", email: "prajesh@email.com"),
-  Helper(name: "Russell", email: "russell@email.com")];
-
-
 class LookerScreen extends StatelessWidget {
-
   Widget build(BuildContext context) {
     return new Scaffold(
       appBar: new AppBar(
-        title: new Text("List of Helpers"),
+          title: new Text("Nearby Helpers"),
       ),
-      body: new Center(
-        child: ListView(
-                shrinkWrap: false,
-                padding: const EdgeInsets.all(20.0),
-
-                children: [
-
-
-              ListTile(title:Text('Name: ' + helpers[0].name + '\n Email: ' + helpers[0].email)),
-
-              ListTile(title:Text('Name: ' + helpers[1].name + '\n Email: ' + helpers[1].email)),
-              ]
-        ),
-        // ignore: duplicate_named_argument
-      ),
+        body: StreamBuilder<QuerySnapshot>(
+          stream: Firestore.instance.collection('helpers').snapshots(),
+          builder:
+              (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+            if (snapshot.hasError) return new Text('Error: ${snapshot.error}');
+            switch (snapshot.connectionState) {
+              case ConnectionState.waiting:
+                return new Text('Loading...');
+              default:
+                return new ListView(
+                  children:
+                      snapshot.data.documents.map((DocumentSnapshot document) {
+                    return new ListTile(
+                      leading: new ImageIcon(NetworkImage(document.data[
+                          "profile_pic"] /*"https://lh5.googleusercontent.com/-G5DvqMfM0JY/AAAAAAAAAAI/AAAAAAAAFPU/qMnPwwnx9m4/s96-c/photo.jpg?sz=256"*/)),
+                      title: new Text(document['name']),
+                      subtitle: new Text(document['skills']),
+                    );
+                  }).toList(),
     );
+  }
+          },
+        ));
   }
 }
 
