@@ -47,6 +47,7 @@ class _AcctCreationState extends State<AcctCreation> {
   // Create a text controller. We will use it to retrieve the current value
   // of the TextField!
   final myController = TextEditingController();
+  final myController2 = TextEditingController();
 
   Widget _buildLoading() {
     return new Scaffold(
@@ -64,8 +65,8 @@ class _AcctCreationState extends State<AcctCreation> {
         body: new Center(
           child: new Container(
             padding: const EdgeInsets.all(32.0),
-            child: new Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+            child: new ListView(
+              //mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 new Text(
                     'You are logged in as ${this.user.displayName}. Welcome new user!',
@@ -103,6 +104,34 @@ class _AcctCreationState extends State<AcctCreation> {
                 new Container(
                   height: 20.0,
                 ),
+                new Text(
+                  'Please enter your bio',
+                  style: new TextStyle(
+                    fontSize: 20.0,
+                    color: Colors.white,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                new Container(
+                  height: 20.0,
+                ),
+                new TextFormField(
+                  keyboardType: TextInputType.multiline,
+                  maxLines: 10,
+                  controller: myController2,
+                  decoration: new InputDecoration(
+                    fillColor: Colors.white,
+                    filled: true,
+                    contentPadding: new EdgeInsets.fromLTRB(
+                        10.0, 30.0, 10.0, 10.0),
+                    border: new OutlineInputBorder(
+                      borderRadius: new BorderRadius.circular(12.0),
+                    ),
+                  ),
+                ),
+                new Container(
+                  height: 20.0,
+                ),
                 // ignore: list_element_type_not_assignable
                 ButtonTheme(
                     height: 50.0,
@@ -121,9 +150,6 @@ class _AcctCreationState extends State<AcctCreation> {
                     ),
                 ),
                 // ignore: argument_type_not_assignable
-                new Container(
-                  height: 70.0,
-                )
               ],
             ),
           ),
