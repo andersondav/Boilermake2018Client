@@ -3,6 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
+import 'manage_acct.dart';
+
 final GoogleSignIn _googleSignIn = GoogleSignIn();
 final FirebaseAuth _auth = FirebaseAuth.instance;
 
@@ -24,7 +26,6 @@ class AcctCreation extends StatefulWidget {
 
 class _AcctCreationState extends State<AcctCreation> {
   FirebaseUser user;
-  DocumentSnapshot userdocument;
 
   void _sendData() {
     // upload the credentials
@@ -38,6 +39,9 @@ class _AcctCreationState extends State<AcctCreation> {
       'profile_pic': this.user.photoUrl,
       'location': 'TODO',
     });
+
+    Navigator.push(context,
+        MaterialPageRoute(builder: (context) => new ManageAccount(user: user)));
   }
 
   // Create a text controller. We will use it to retrieve the current value
@@ -102,16 +106,23 @@ class _AcctCreationState extends State<AcctCreation> {
           .document(user.email.toLowerCase())
           .get();
 
-      setState(() {
-        this.user = user;
-        this.userdocument = document;
-      });
+      if (document.exists) {
+        // they arlready have an account, go to manage_acct
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => new ManageAccount(user: user)));
+      } else {
+        setState(() {
+          this.user = user;
+        });
+      }
     }();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (userdocument == null) {
+    if (user == null) {
       // still loading
       return _buildLoading();
     } else {
