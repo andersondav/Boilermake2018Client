@@ -29,18 +29,27 @@ class AcctCreation extends StatefulWidget {
 
 class _AcctCreationState extends State<AcctCreation> {
   FirebaseUser user;
+  Prediction location;
 
-  void _sendData() {
+  void _getLoc(BuildContext context) async {
+    Prediction pre = await showGooglePlacesAutocomplete(
+        apiKey: MAPS_API_KEY, context: context);
+
+    setState(() => location = pre);
+  }
+
+  void _sendData() async {
     // upload the credentials
-    Firestore.instance
+    await Firestore.instance
         .collection('helpers')
         .document(this.user.email.toLowerCase())
         .setData({
       'email': this.user.email,
       'name': this.user.displayName,
-      'skills': myController.text,
+      'skills': skillsController.text,
       'profile_pic': this.user.photoUrl,
-      'location': 'TODO',
+      'location': location.placeId,
+      'bio': bioController.text,
     });
 
     Navigator.pop(
@@ -53,8 +62,8 @@ class _AcctCreationState extends State<AcctCreation> {
 
   // Create a text controller. We will use it to retrieve the current value
   // of the TextField!
-  final myController = TextEditingController();
-  final myController2 = TextEditingController();
+  final skillsController = TextEditingController();
+  final bioController = TextEditingController();
 
   Widget _buildLoading() {
     return new Scaffold(
@@ -95,7 +104,7 @@ class _AcctCreationState extends State<AcctCreation> {
                   height: 20.0,
                 ),
                 new TextFormField(
-                  controller: myController,
+                  controller: skillsController,
                   decoration: new InputDecoration(
                     fillColor: Colors.white,
                     filled: true,
@@ -123,7 +132,7 @@ class _AcctCreationState extends State<AcctCreation> {
                 new TextFormField(
                   keyboardType: TextInputType.multiline,
                   maxLines: 10,
-                  controller: myController2,
+                  controller: bioController,
                   decoration: new InputDecoration(
                     fillColor: Colors.white,
                     filled: true,
@@ -138,8 +147,14 @@ class _AcctCreationState extends State<AcctCreation> {
                   height: 20.0,
                 ),
                 // ignore: list_element_type_not_assignable
-                new LocPickerButton(
-                  onResponse: (a) => print(a),
+                FlatButton(
+                  child: Row(children: [
+                    Icon(Icons.map),
+                    Text(location != null
+                        ? location.description
+                        : 'Pick a location')
+                  ]),
+                  onPressed: () => _getLoc(context),
                 ),
                 ButtonTheme(
                   height: 50.0,
@@ -198,36 +213,5 @@ class _AcctCreationState extends State<AcctCreation> {
     } else {
       return _buildCreateAcct();
     }
-  }
-}
-
-class LocPickerButton extends StatefulWidget {
-  LocPickerButton({this.onResponse});
-
-  Function onResponse;
-
-  @override
-  _LocPickerButtonState createState() => _LocPickerButtonState();
-}
-
-class _LocPickerButtonState extends State<LocPickerButton> {
-  Prediction prediction;
-
-  void _getLoc(BuildContext context) async {
-    Prediction pre = await showGooglePlacesAutocomplete(
-        apiKey: MAPS_API_KEY, context: context);
-
-    setState(() => prediction = pre);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FlatButton(
-      child: Row(children: [
-        Icon(Icons.map),
-        Text(prediction != null ? prediction.description : 'Pick a location')
-      ]),
-      onPressed: () => _getLoc(context),
-    );
   }
 }
