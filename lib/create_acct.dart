@@ -47,27 +47,62 @@ class AcctCreation extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 new Text(
-                    'You are ${this.user.displayName}. ${userexists ? "Welcome Back!" : "Welcome new user!"}'),
+                    'You are logged in as ${this.user.displayName}. ${userexists ? "Welcome Back!" : "Welcome new user!"}',
+                    style: new TextStyle(
+                      color: Colors.white
+                    ),
+                    textAlign: TextAlign.center,
+                ),
+                new Container(
+                  height: 20.0,
+                ),
                 new Text(
-                  'Please enter your areas of expertise',
+                  'Please enter your skills',
                   style: new TextStyle(
                     fontSize: 20.0,
-                    color: Colors.black54,
+                    color: Colors.white,
                   ),
                   textAlign: TextAlign.center,
                 ),
+                new Container(
+                  height: 20.0,
+                ),
                 new TextFormField(
                   controller: myController,
+                  decoration: new InputDecoration(
+                      fillColor: Colors.white,
+                      filled: true,
+                      contentPadding: new EdgeInsets.fromLTRB(
+                          10.0, 30.0, 10.0, 10.0),
+                      border: new OutlineInputBorder(
+                        borderRadius: new BorderRadius.circular(12.0),
+                      ),
+                      ),
+                ),
+                new Container(
+                  height: 20.0,
                 ),
                 // ignore: list_element_type_not_assignable
-                RaisedButton(
-                    child: Text('Submit'),
-                    textColor: Colors.black54,
-                    color: Theme.of(context).accentColor,
-                    elevation: 4.0,
-                    splashColor: Colors.blueGrey,
-                    onPressed: _sendData),
+                ButtonTheme(
+                    height: 50.0,
+                    minWidth: 80.0,
+                    child: RaisedButton(
+                      splashColor: Colors.grey,
+                      color: Colors.blue,
+                      onPressed: _sendData,
+                      child: new Text(
+                          'Submit',
+                          style: new TextStyle(
+                            fontSize: 30.0,
+                            color: Colors.white,
+                          )
+                      ),
+                    ),
+                ),
                 // ignore: argument_type_not_assignable
+                new Container(
+                  height: 70.0,
+                )
               ],
             ),
           ),
