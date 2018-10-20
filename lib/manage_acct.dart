@@ -12,28 +12,7 @@ class ManageAccount extends StatefulWidget {
 }
 
 class _ManageAccountState extends State<ManageAccount> {
-  _ManageAccountState() : skillsController = TextEditingController();
-
   DocumentSnapshot document;
-
-  final TextEditingController skillsController;
-
-  void _saveSkills() {
-    Firestore.instance
-        .collection('helpers')
-        .document(widget.user.email.toLowerCase())
-        .setData({'skills': skillsController.text}, merge: true);
-  }
-
-  void _deleteAccount() {
-    Firestore.instance
-        .collection('helpers')
-        .document(widget.user.email.toLowerCase())
-        .delete();
-
-    Navigator.popUntil(
-        context, ModalRoute.withName(Navigator.defaultRouteName));
-  }
 
   Widget _buildLoading() {
     return new Scaffold(
@@ -43,8 +22,6 @@ class _ManageAccountState extends State<ManageAccount> {
   }
 
   Widget _buildLoaded() {
-    skillsController.text = document['skills'];
-
     return Scaffold(
       appBar: AppBar(title: Text('Manage Helper Account')),
       body: Center(
@@ -53,20 +30,12 @@ class _ManageAccountState extends State<ManageAccount> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Text('Skills'),
-              TextFormField(
-                controller: skillsController,
-              ),
-              RaisedButton(
-                child: Text('Save Skills'),
-                onPressed: _saveSkills,
+              _EditSkillsArea(
+                initState: document['skills'],
+                user: widget.user,
               ),
               Divider(),
-              RaisedButton(
-                child: Text('Delete Account'),
-                color: Colors.red,
-                onPressed: _deleteAccount,
-              )
+              _DeleteAccountButton(user: widget.user)
             ],
           ),
         ),
@@ -92,5 +61,69 @@ class _ManageAccountState extends State<ManageAccount> {
     } else {
       return _buildLoaded();
     }
+  }
+}
+
+class _DeleteAccountButton extends StatelessWidget {
+  _DeleteAccountButton({this.user});
+
+  final FirebaseUser user;
+
+  void _deleteAccount(BuildContext context) async {
+    await Firestore.instance
+        .collection('helpers')
+        .document(user.email.toLowerCase())
+        .delete();
+
+    Scaffold.of(context).showSnackBar(new SnackBar(
+      content: new Text("Account Deleted"),
+    ));
+
+    Navigator.popUntil(
+        context, ModalRoute.withName(Navigator.defaultRouteName));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return RaisedButton(
+      onPressed: () => _deleteAccount(context),
+      child: Text('Delete Account'),
+      color: Colors.red,
+    );
+  }
+}
+
+class _EditSkillsArea extends StatelessWidget {
+  _EditSkillsArea({initState: String, this.user})
+      : skillsController = TextEditingController(text: initState);
+
+  final TextEditingController skillsController;
+  final FirebaseUser user;
+
+  void _saveSkills(BuildContext context) async {
+    await Firestore.instance
+        .collection('helpers')
+        .document(user.email.toLowerCase())
+        .setData({'skills': skillsController.text}, merge: true);
+
+    Scaffold.of(context).showSnackBar(new SnackBar(
+      content: new Text("Skills Saved"),
+    ));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text('Skills'),
+          TextFormField(
+            controller: skillsController,
+          ),
+          RaisedButton(
+            child: Text('Save Skills'),
+            onPressed: () => _saveSkills(context),
+          ),
+        ]);
   }
 }
