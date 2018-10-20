@@ -67,11 +67,14 @@ class _MyHomePageState extends State<MyHomePage> {
               minWidth: 200.0,
               height: 100.0,
               child: initialOptions(
-                 text: 'Looking for help', redirScreen: new LookerScreen()),
-
-
-
-
+                  text: 'Looking for help',
+                  handleFunc: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => new LookerScreen()),
+                    );
+                  }),
             ),
             new Container(
               height: 20.0,
@@ -80,23 +83,39 @@ class _MyHomePageState extends State<MyHomePage> {
               minWidth: 200.0,
               height: 100.0,
               child: initialOptions(
-                  text: 'Offering help', redirScreen: new HelperScreen()),
+                  text: 'Offering help',
+                  handleFunc: () {
+                    _handleSignIn().then(((user) {
+                      Firestore.instance
+                          .collection('helpers')
+                          .document(user.email.toLowerCase())
+                          .get()
+                          .then((DocumentSnapshot document) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => new HelperScreen(
+                                    user: user,
+                                    userdocument: document,
+                                  )),
+                        );
+                      });
+                    }));
+                  }),
             ),
-            // ignore: argument_type_not_assignable
           ],
         ),
-        // ignore: duplicate_named_argument
       ),
     );
   }
 }
 
 class initialOptions extends RaisedButton {
-  initialOptions({Key key, this.text, this.redirScreen}) : super(key: key);
+  initialOptions({Key key, this.text, this.handleFunc}) : super(key: key);
 
   final String text;
 
-  final Widget redirScreen;
+  final Function handleFunc;
 
   MaterialColor buttonColor;
 
@@ -119,17 +138,17 @@ class initialOptions extends RaisedButton {
         color: this.buttonColor,
         elevation: 4.0,
         splashColor: Colors.blueGrey,
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => this.redirScreen),
-          );
-        });
+        onPressed: handleFunc);
   }
 }
 
 // Define a Custom Form Widget
 class HelperScreen extends StatefulWidget {
+  HelperScreen({this.user, this.userdocument});
+
+  final FirebaseUser user;
+  final DocumentSnapshot userdocument;
+
   @override
   _HelperScreenState createState() => _HelperScreenState();
 }
@@ -149,16 +168,15 @@ Future<FirebaseUser> _handleSignIn() async {
 // our Form.
 class _HelperScreenState extends State<HelperScreen> {
   void _sendData() {
-    _handleSignIn().then((user) {
-      // TODO: check for duplicates, and if there is one allow for editing of stuff
-
-      // upload the credentials
-      Firestore.instance.collection('helpers').document().setData({
-        'email': user.email,
-        'name': user.displayName,
-        'skills': myController.text,
-        'location': 'TODO',
-      });
+    // upload the credentials
+    Firestore.instance
+        .collection('helpers')
+        .document(this.widget.user.email.toLowerCase())
+        .setData({
+      'email': this.widget.user.email,
+      'name': this.widget.user.displayName,
+      'skills': myController.text,
+      'location': 'TODO',
     });
   }
 
@@ -175,6 +193,12 @@ class _HelperScreenState extends State<HelperScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // see if they are already a user
+    bool userexists = widget.userdocument.exists;
+    if (userexists) {
+      myController.text = widget.userdocument.data['skills'];
+    }
+
     return new Scaffold(
       backgroundColor: Colors.black,
       appBar: new AppBar(
@@ -187,6 +211,8 @@ class _HelperScreenState extends State<HelperScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               new Text(
+                  'You are ${this.widget.user.displayName}. ${userexists ? "Welcome Back!" : "Welcome new user!"}'),
+              new Text(
                 'Please enter your areas of expertise',
                 style: new TextStyle(
                   fontSize: 20.0,
@@ -196,7 +222,6 @@ class _HelperScreenState extends State<HelperScreen> {
               ),
               new TextFormField(
                 controller: myController,
-                initialValue: null,
               ),
               // ignore: list_element_type_not_assignable
               RaisedButton(
