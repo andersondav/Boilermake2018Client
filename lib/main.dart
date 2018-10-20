@@ -56,7 +56,8 @@ class _MyHomePageState extends State<MyHomePage> {
               'I am...',
               style: new TextStyle(
                 fontSize: 40.0,
-                color: Color(0xAACFB53B), //psuedo old gold because actual old gold does not come for some reason
+                color: Color(
+                    0xAACFB53B), //psuedo old gold because actual old gold does not come for some reason
               ),
             ),
             new Container(
@@ -201,51 +202,51 @@ class _HelperScreenState extends State<HelperScreen> {
     }
 
     return new Scaffold(
-      backgroundColor: Colors.black,
-      appBar: new AppBar(
-        title: new Text('Helper Data Entry'),
-      ),
-      body: new Center(
-        child: new Container(
-          padding: const EdgeInsets.all(32.0),
-          child: new Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              new Text(
-                  'You are ${this.widget.user.displayName}. ${userexists ? "Welcome Back!" : "Welcome new user!"}'),
-              new Text(
-                'Please enter your areas of expertise',
-                style: new TextStyle(
-                  fontSize: 20.0,
-                  color: Colors.black54,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              new TextFormField(
-                controller: myController,
-              ),
-              // ignore: list_element_type_not_assignable
-              RaisedButton(
-                  child: Text('Submit'),
-                  textColor: Colors.black54,
-                  color: Theme.of(context).accentColor,
-                  elevation: 4.0,
-                  splashColor: Colors.blueGrey,
-                  onPressed: _sendData),
-              // ignore: argument_type_not_assignable
-            ],
-          ),
+        backgroundColor: Colors.black,
+        appBar: new AppBar(
+          title: new Text('Helper Data Entry'),
         ),
-    ));
+        body: new Center(
+          child: new Container(
+            padding: const EdgeInsets.all(32.0),
+            child: new Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                new Text(
+                    'You are ${this.widget.user.displayName}. ${userexists ? "Welcome Back!" : "Welcome new user!"}'),
+                new Text(
+                  'Please enter your areas of expertise',
+                  style: new TextStyle(
+                    fontSize: 20.0,
+                    color: Colors.black54,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                new TextFormField(
+                  controller: myController,
+                ),
+                // ignore: list_element_type_not_assignable
+                RaisedButton(
+                    child: Text('Submit'),
+                    textColor: Colors.black54,
+                    color: Theme.of(context).accentColor,
+                    elevation: 4.0,
+                    splashColor: Colors.blueGrey,
+                    onPressed: _sendData),
+                // ignore: argument_type_not_assignable
+              ],
+            ),
+          ),
+        ));
   }
 }
 
 class LookerScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return new Scaffold(
-      appBar: new AppBar(
+        appBar: new AppBar(
           title: new Text("Nearby Helpers"),
-      ),
+        ),
         body: StreamBuilder<QuerySnapshot>(
           stream: Firestore.instance.collection('helpers').snapshots(),
           builder:
@@ -259,14 +260,14 @@ class LookerScreen extends StatelessWidget {
                   children:
                       snapshot.data.documents.map((DocumentSnapshot document) {
                     return new ListTile(
-                      leading: new ImageIcon(NetworkImage(document.data[
-                          "profile_pic"] /*"https://lh5.googleusercontent.com/-G5DvqMfM0JY/AAAAAAAAAAI/AAAAAAAAFPU/qMnPwwnx9m4/s96-c/photo.jpg?sz=256"*/)),
+                      leading: Image.network(
+                          document.data["profile_pic"] + "?sz=64"),
                       title: new Text(document['name']),
                       subtitle: new Text(document['skills']),
                     );
                   }).toList(),
-    );
-  }
+                );
+            }
           },
         ));
   }
