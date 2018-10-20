@@ -44,7 +44,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-      backgroundColor: Colors.deepOrangeAccent,
+      backgroundColor: Colors.black,
       appBar: new AppBar(
         title: new Text(widget.title),
       ),
@@ -56,7 +56,7 @@ class _MyHomePageState extends State<MyHomePage> {
               'I am...',
               style: new TextStyle(
                 fontSize: 40.0,
-                color: Colors.black54,
+                color: Color(0xAACFB53B), //psuedo old gold because actual old gold does not come for some reason
               ),
             ),
             new Container(
@@ -67,7 +67,11 @@ class _MyHomePageState extends State<MyHomePage> {
               minWidth: 200.0,
               height: 100.0,
               child: initialOptions(
-                  text: 'Looking for help', redirScreen: new LookerScreen()),
+                 text: 'Looking for help', redirScreen: new LookerScreen()),
+
+
+
+
             ),
             new Container(
               height: 20.0,
@@ -92,19 +96,15 @@ class initialOptions extends RaisedButton {
 
   final String text;
 
-  final StatefulWidget redirScreen;
+  final Widget redirScreen;
 
   MaterialColor buttonColor;
 
-  void _test() {
-    print('Alrighty');
-  }
-
   void _setColor() {
     if (this.text == "Offering help") {
-      this.buttonColor = Colors.green;
+      this.buttonColor = MaterialColor(0xAACFB53B, null);
     } else {
-      this.buttonColor = Colors.blue;
+      this.buttonColor = MaterialColor(0xAACFB53B, null);
     }
   }
 
@@ -125,22 +125,6 @@ class initialOptions extends RaisedButton {
             MaterialPageRoute(builder: (context) => this.redirScreen),
           );
         });
-  }
-}
-
-class LookerScreen extends StatefulWidget {
-  @override
-  _LookerScreenState createState() => _LookerScreenState();
-}
-
-class _LookerScreenState extends State<LookerScreen> {
-  @override
-  Widget build(BuildContext ctxt) {
-    return new Scaffold(
-        appBar: new AppBar(
-          title: new Text("Nearby Helpers"),
-        ),
-        body: new Center());
   }
 }
 
@@ -192,7 +176,7 @@ class _HelperScreenState extends State<HelperScreen> {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-      backgroundColor: Colors.deepOrangeAccent,
+      backgroundColor: Colors.black,
       appBar: new AppBar(
         title: new Text('Helper Data Entry'),
       ),
@@ -226,7 +210,45 @@ class _HelperScreenState extends State<HelperScreen> {
             ],
           ),
         ),
+    ));
+  }
+}
 
+class Helper {
+  Helper({this.name, this.email});
+
+  String name;
+  String email;
+  String bio;
+
+}
+
+
+List<Helper> helpers = [
+  Helper(name: "Prajesh", email: "prajesh@email.com"),
+  Helper(name: "Russell", email: "russell@email.com")];
+
+
+class LookerScreen extends StatelessWidget {
+
+  Widget build(BuildContext context) {
+    return new Scaffold(
+      appBar: new AppBar(
+        title: new Text("List of Helpers"),
+      ),
+      body: new Center(
+        child: ListView(
+                shrinkWrap: false,
+                padding: const EdgeInsets.all(20.0),
+
+                children: [
+
+
+              ListTile(title:Text('Name: ' + helpers[0].name + '\n Email: ' + helpers[0].email)),
+
+              ListTile(title:Text('Name: ' + helpers[1].name + '\n Email: ' + helpers[1].email)),
+              ]
+        ),
         // ignore: duplicate_named_argument
       ),
     );
