@@ -10,3 +10,4 @@ pubspec.lock
 .flutter-plugins
 .gradle/
 android/.gradle
+android/local.properties
