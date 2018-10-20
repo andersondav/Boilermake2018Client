@@ -29,7 +29,8 @@ class MyApp extends StatelessWidget {
     return new MaterialApp(
       title: 'Flutter Demo',
       theme: new ThemeData(
-          primarySwatch: Colors.blue, backgroundColor: Colors.black54),
+          brightness: Brightness.dark,
+          primarySwatch: Colors.blue, ),
       home: new MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
@@ -56,7 +57,6 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-      backgroundColor: Colors.black,
       appBar: new AppBar(
         title: new Text(widget.title),
       ),
@@ -111,7 +111,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-class InitialOptions extends RaisedButton {
+class InitialOptions extends StatelessWidget {
   InitialOptions({Key key, this.text, this.handleFunc}) : super(key: key);
 
   final String text;
