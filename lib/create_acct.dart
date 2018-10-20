@@ -96,7 +96,11 @@ class _AcctCreationState extends State<AcctCreation> {
                 ),
                 new TextFormField(
                   controller: myController,
+                  style: TextStyle(
+                    color: Colors.black
+                  ),
                   decoration: new InputDecoration(
+
                     fillColor: Colors.white,
                     filled: true,
                     contentPadding:
@@ -121,6 +125,9 @@ class _AcctCreationState extends State<AcctCreation> {
                   height: 20.0,
                 ),
                 new TextFormField(
+                  style: TextStyle(
+                      color: Colors.black
+                  ),
                   keyboardType: TextInputType.multiline,
                   maxLines: 10,
                   controller: myController2,
@@ -135,11 +142,14 @@ class _AcctCreationState extends State<AcctCreation> {
                   ),
                 ),
                 new Container(
-                  height: 20.0,
+                  height: 30.0,
                 ),
                 // ignore: list_element_type_not_assignable
                 new LocPickerButton(
                   onResponse: (a) => print(a),
+                ),
+                new Container(
+                  height: 20.0,
                 ),
                 ButtonTheme(
                   height: 50.0,
