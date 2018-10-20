@@ -98,22 +98,10 @@ class _MyHomePageState extends State<MyHomePage> {
               child: InitialOptions(
                   text: 'Offering help',
                   handleFunc: () {
-                    _handleSignIn().then(((user) {
-                      Firestore.instance
-                          .collection('helpers')
-                          .document(user.email.toLowerCase())
-                          .get()
-                          .then((DocumentSnapshot document) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => new AcctCreation(
-                                    user: user,
-                                    userdocument: document,
-                                  )),
-                        );
-                      });
-                    }));
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => new AcctCreation()));
                   }),
             ),
           ],
@@ -142,6 +130,17 @@ class InitialOptions extends RaisedButton {
 
   Widget build(BuildContext context) {
     _setColor();
+    Future<FirebaseUser> _handleSignIn() async {
+      GoogleSignInAccount googleUser = await _googleSignIn.signIn();
+      GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      FirebaseUser user = await _auth.signInWithGoogle(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+      print("signed in " + user.displayName);
+      return user;
+    }
+
     return new RaisedButton(
         child: Text(this.text,
             style: new TextStyle(

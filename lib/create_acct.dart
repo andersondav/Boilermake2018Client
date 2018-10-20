@@ -1,13 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+
+final GoogleSignIn _googleSignIn = GoogleSignIn();
+final FirebaseAuth _auth = FirebaseAuth.instance;
+
+Future<FirebaseUser> _handleSignIn() async {
+  GoogleSignInAccount googleUser = await _googleSignIn.signIn();
+  GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+  FirebaseUser user = await _auth.signInWithGoogle(
+    accessToken: googleAuth.accessToken,
+    idToken: googleAuth.idToken,
+  );
+  return user;
+}
 
 // Define a Custom Form Widget
-class AcctCreation extends StatelessWidget {
-  AcctCreation({this.user, this.userdocument});
+class AcctCreation extends StatefulWidget {
+  @override
+  _AcctCreationState createState() => new _AcctCreationState();
+}
 
-  final FirebaseUser user;
-  final DocumentSnapshot userdocument;
+class _AcctCreationState extends State<AcctCreation> {
+  FirebaseUser user;
+  DocumentSnapshot userdocument;
 
   void _sendData() {
     // upload the credentials
@@ -27,14 +44,14 @@ class AcctCreation extends StatelessWidget {
   // of the TextField!
   final myController = TextEditingController();
 
-  @override
-  Widget build(BuildContext context) {
-    // see if they are already a user
-    bool userexists = userdocument.exists;
-    if (userexists) {
-      myController.text = userdocument.data['skills'];
-    }
+  Widget _buildLoading() {
+    return new Scaffold(
+        backgroundColor: Colors.black,
+        appBar: new AppBar(title: Text("Loading...")),
+        body: Center(child: CircularProgressIndicator()));
+  }
 
+  Widget _buildCreateAcct() {
     return new Scaffold(
         backgroundColor: Colors.black,
         appBar: new AppBar(
@@ -46,8 +63,7 @@ class AcctCreation extends StatelessWidget {
             child: new Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                new Text(
-                    'You are ${this.user.displayName}. ${userexists ? "Welcome Back!" : "Welcome new user!"}'),
+                new Text('Welcome new user: ${this.user.displayName}'),
                 new Text(
                   'Please enter your areas of expertise',
                   style: new TextStyle(
@@ -72,5 +88,34 @@ class AcctCreation extends StatelessWidget {
             ),
           ),
         ));
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    () async {
+      // start logging in
+      FirebaseUser user = await _handleSignIn();
+      DocumentSnapshot document = await Firestore.instance
+          .collection('helpers')
+          .document(user.email.toLowerCase())
+          .get();
+
+      setState(() {
+        this.user = user;
+        this.userdocument = document;
+      });
+    }();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (userdocument == null) {
+      // still loading
+      return _buildLoading();
+    } else {
+      return _buildCreateAcct();
+    }
   }
 }
