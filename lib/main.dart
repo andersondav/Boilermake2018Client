@@ -67,7 +67,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ButtonTheme(
               minWidth: 200.0,
               height: 100.0,
-              child: initialOptions(
+              child: InitialOptions(
                   text: 'Looking for help',
                   handleFunc: () {
                     Navigator.push(
@@ -83,7 +83,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ButtonTheme(
               minWidth: 200.0,
               height: 100.0,
-              child: initialOptions(
+              child: InitialOptions(
                   text: 'Offering help',
                   handleFunc: () {
                     _handleSignIn().then(((user) {
@@ -111,8 +111,8 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-class initialOptions extends RaisedButton {
-  initialOptions({Key key, this.text, this.handleFunc}) : super(key: key);
+class InitialOptions extends RaisedButton {
+  InitialOptions({Key key, this.text, this.handleFunc}) : super(key: key);
 
   final String text;
 
