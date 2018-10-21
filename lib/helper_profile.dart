@@ -15,7 +15,14 @@ class HelperProfile extends StatefulWidget {
 }
 
 class _HelperProfileState extends State<HelperProfile> {
-  void _chat() {
+  void _chat() async {
+    await Firestore.instance
+        .collection("/helpers")
+        .document(widget.document['email'])
+        .collection('chats')
+        .document(widget.user.email)
+        .setData({});
+
     Navigator.push(
         context,
         MaterialPageRoute(
