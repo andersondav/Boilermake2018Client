@@ -4,7 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-import 'chat.dart';
+//import 'chat.dart';
 
 class HelperProfile extends StatefulWidget {
   HelperProfile({this.user, this.document});
@@ -60,21 +60,6 @@ class _HelperProfileState extends State<HelperProfile> {
               style: new TextStyle(
                 fontSize: 40.0
               )
-            ),
-            new Container(
-              child: Text(widget.document.data['name'],
-                style: new TextStyle(fontSize: 40.0)
-              )
-            ),
-              new Container(
-                width: 75.0,
-                height: 75.0,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  image: DecorationImage(
-                      fit: BoxFit.fill,
-                      image: NetworkImage(
-                          widget.document.data["profile_pic"] + "?sz=75"))),
             ),
             new Container(
               height: 20.0,
