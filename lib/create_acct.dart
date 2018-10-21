@@ -78,9 +78,8 @@ class _AcctCreationState extends State<AcctCreation> {
           title: new Text('Helper Data Entry'),
         ),
         body: new Center(
-          child: new Container(
-            padding: const EdgeInsets.all(32.0),
-            child: new ListView(
+          child: new ListView(
+            padding: new EdgeInsets.fromLTRB(30.0, 10.0, 30.0, 10.0),
               //mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 new Text(
@@ -183,7 +182,6 @@ class _AcctCreationState extends State<AcctCreation> {
                 ),
                 // ignore: argument_type_not_assignable
               ],
-            ),
           ),
         ));
   }
