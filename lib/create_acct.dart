@@ -75,14 +75,12 @@ class _AcctCreationState extends State<AcctCreation> {
 
   Widget _buildLoading() {
     return new Scaffold(
-        backgroundColor: Colors.black,
         appBar: new AppBar(title: Text("Loading...")),
         body: Center(child: CircularProgressIndicator()));
   }
 
   Widget _buildCreateAcct() {
     return new Scaffold(
-        backgroundColor: Colors.black,
         appBar: new AppBar(
           title: new Text('Helper Data Entry'),
         ),
