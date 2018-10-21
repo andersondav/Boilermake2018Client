@@ -12,7 +12,7 @@ class ChatScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Chat with ${isHelper ? helper : helpee}")),
+      appBar: AppBar(title: Text("Chat with ${isHelper ? helpee : helper}")),
       body: StreamBuilder<QuerySnapshot>(
         stream: Firestore.instance
             .collection('helpers')

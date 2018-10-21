@@ -1,3 +1,4 @@
+import 'package:boilermake2018/chat.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:latlong/latlong.dart';
@@ -22,6 +23,13 @@ class _HelperProfileState extends State<HelperProfile> {
 
   }
 
+  _goToChat(){
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => new ChatScreen(helper: widget.document.data['name'], helpee: 'Client', isHelper: false,)));
+  }
+
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
@@ -32,22 +40,22 @@ class _HelperProfileState extends State<HelperProfile> {
         child: new Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            new Container(
+              width: 75.0,
+              height: 75.0,
+              decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  image: DecorationImage(
+                      fit: BoxFit.fill,
+                      image: NetworkImage(
+                          widget.document.data["profile_pic"] + "?sz=75"))
+              ),
+            ),
             new Text(
               widget.document.data['name'],
               style: new TextStyle(
                 fontSize: 40.0
               )
-            ),
-            new Container(
-            width: 75.0,
-            height: 75.0,
-            decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                image: DecorationImage(
-                    fit: BoxFit.fill,
-                    image: NetworkImage(
-                        widget.document.data["profile_pic"] + "?sz=75"))
-            ),
             ),
             new Container(
               height: 20.0,
@@ -62,7 +70,12 @@ class _HelperProfileState extends State<HelperProfile> {
                 minWidth: 200.0,
                 height: 100.0,
                 child: RaisedButton(
-                    child: new Text('Message'),
+                  onPressed: _goToChat,
+                    child: new Text('Message',
+                    style: new TextStyle(
+                        fontSize: 35.0
+                    )),
+                  color: Colors.blue,
                 )
             ),
           ],
