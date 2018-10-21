@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:latlong/latlong.dart';
@@ -37,10 +38,11 @@ class LookerScreen extends StatelessWidget {
 }
 
 class _HelperItem extends StatefulWidget {
-  _HelperItem({this.loc, this.document});
+  _HelperItem({this.loc, this.document, this.user});
 
   final LatLng loc;
   final DocumentSnapshot document;
+  final FirebaseUser user;
 
   @override
   _HelperItemState createState() => _HelperItemState();
@@ -52,12 +54,11 @@ class _HelperItemState extends State<_HelperItem> {
 
   _goToProfile() {
     print('switching...');
-//    WidgetsBinding.instance.addPostFrameCallback((_) async {
-//      Navigator.push(
-//          context,
-//          MaterialPageRoute(
-//              builder: (context) => new HelperProfile()));
-//    });
+
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => new HelperProfile(user: widget.user, document: widget.document)));
   }
 
   @override
@@ -80,7 +81,7 @@ class _HelperItemState extends State<_HelperItem> {
   @override
   Widget build(BuildContext context) {
     return new ListTile(
-      onLongPress: _goToProfile(),
+      onTap: _goToProfile,
         leading: Container(
             width: 50.0,
             height: 50.0,

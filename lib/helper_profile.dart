@@ -17,21 +17,9 @@ class HelperProfile extends StatefulWidget {
 
 class _HelperProfileState extends State<HelperProfile> {
 
-  DocumentSnapshot document;
-
   void initState() {
     super.initState();
 
-
-    Firestore.instance
-        .collection('helpers')
-        .document(widget.user.email.toLowerCase())
-        .get()
-        .then((document) {
-
-      this.setState(() => this.document = document);
-
-      });
   }
 
   @override
@@ -44,23 +32,28 @@ class _HelperProfileState extends State<HelperProfile> {
         child: new Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            new Text(
+              widget.document.data['name'],
+              style: new TextStyle(
+                fontSize: 40.0
+              )
+            ),
             new Container(
-            width: 50.0,
-            height: 50.0,
-//            decoration: BoxDecoration(
-//                shape: BoxShape.circle,
-//                image: DecorationImage(
-//                    fit: BoxFit.fill,
-//                    image: NetworkImage(
-//                        document.data["profile_pic"] + "?sz=50"))
-//            ),
+            width: 75.0,
+            height: 75.0,
+            decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                image: DecorationImage(
+                    fit: BoxFit.fill,
+                    image: NetworkImage(
+                        widget.document.data["profile_pic"] + "?sz=75"))
+            ),
             ),
             new Container(
               height: 20.0,
             ),
             new Text(
-              'Hello'
-              //document.data['bio']
+              widget.document.data['bio']
             ),
             new Container(
               height: 20.0,
