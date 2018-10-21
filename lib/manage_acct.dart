@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_google_places_autocomplete/flutter_google_places_autocomplete.dart';
 
-import 'create_acct.dart';
+import 'chat.dart';
 
 class ManageAccount extends StatefulWidget {
   ManageAccount({this.user});
@@ -23,14 +23,12 @@ class _ManageAccountState extends State<ManageAccount> {
   void initState() {
     super.initState();
 
-
     Firestore.instance
         .collection('helpers')
         .document(widget.user.email.toLowerCase())
         .get()
         .then((document) {
-
-        this.setState(() => this.document = document);
+      this.setState(() => this.document = document);
 
       dataFromPlaceID(document["location"]).then((data) {
         setState(() {
@@ -59,49 +57,81 @@ class _ManageAccountState extends State<ManageAccount> {
         body: Center(child: CircularProgressIndicator()));
   }
 
+  void _openChat(String otherUser) {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => new ChatScreen(
+                  helper: widget.user.email,
+                  helpee: otherUser,
+                  isHelper: true,
+                )));
+  }
+
   Widget _buildLoaded() {
     return Scaffold(
       appBar: AppBar(title: Text('Manage Helper Account')),
       body: Center(
         child: Container(
           padding: EdgeInsets.all(15.0),
-          child: ListView(
-            //crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              _EditSkillsArea(
-                initState: document['skills'],
-                user: widget.user,
-              ),
-              Divider(
-                height: 10.0
-              ),
-              _EditBioArea(
-                initState: document['bio'],
-                user: widget.user,
-              ),
-              Divider(
-                  height: 10.0
-              ),
-              FlatButton(
-                child: Row(children: [
-                  Icon(Icons.map),
-                  Flexible(
-                      child: Container(
-                          child: Text(
-                            location != null
-                                ? location.description
-                                : locationName,
-                            overflow: TextOverflow.ellipsis,
-                          ))),
-                ]),
-                onPressed: () => _getLoc(context),
-              ),
-              Divider(
-                height: 10.0,
-              ),
-              _DeleteAccountButton(user: widget.user),
-
-            ],
+          child: StreamBuilder<QuerySnapshot>(
+            stream: Firestore.instance
+                .collection('/helpers')
+                .document(widget.user.email.toLowerCase())
+                .collection('chats')
+                .snapshots(),
+            builder:
+                (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+              return ListView(
+                //crossAxisAlignment: CrossAxisAlignment.start,
+                children: snapshot.connectionState == ConnectionState.waiting
+                    ? List<Widget>()
+                    : <Widget>[
+                          Text(
+                            'Chats',
+                            style: TextStyle(fontSize: 20.0),
+                          )
+                        ] +
+                        snapshot.data.documents.map((DocumentSnapshot doc) {
+                          Widget w = ListTile(
+                              onTap: () => _openChat(doc.documentID),
+                              title: Container(
+                                  padding: EdgeInsets.all(20.0),
+                                  child: Text(doc.documentID)));
+                          return w;
+                        }).toList()
+                  ..addAll(<Widget>[
+                    _EditSkillsArea(
+                      initState: document['skills'],
+                      user: widget.user,
+                    ),
+                    Divider(height: 10.0),
+                    _EditBioArea(
+                      initState: document['bio'],
+                      user: widget.user,
+                    ),
+                    Divider(height: 10.0),
+                    FlatButton(
+                      child: Row(children: [
+                        Icon(Icons.map),
+                        Flexible(
+                            child: Container(
+                                child: Text(
+                          location != null
+                              ? location.description
+                              : locationName,
+                          overflow: TextOverflow.ellipsis,
+                        ))),
+                      ]),
+                      onPressed: () => _getLoc(context),
+                    ),
+                    Divider(
+                      height: 10.0,
+                    ),
+                    _DeleteAccountButton(user: widget.user),
+                  ]),
+              );
+            },
           ),
         ),
       ),
@@ -173,8 +203,7 @@ class _EditSkillsArea extends StatelessWidget {
           Text('Skills',
               style: TextStyle(
                 fontSize: 20.0,
-              )
-          ),
+              )),
           TextFormField(
             controller: skillsController,
           ),
@@ -210,22 +239,21 @@ class _EditBioArea extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Text('Bio',
-          style: TextStyle(
-            fontSize: 20.0,
-          )
-          ),
+              style: TextStyle(
+                fontSize: 20.0,
+              )),
           Container(
             height: 10.0,
           ),
           TextFormField(
             // ignore: argument_type_not_assignable
-          decoration: new InputDecoration(
-            filled: true,
-            contentPadding: new EdgeInsets.fromLTRB(10.0, 30.0, 10.0, 10.0),
-            border: new OutlineInputBorder(
-            borderRadius: new BorderRadius.circular(12.0),
+            decoration: new InputDecoration(
+              filled: true,
+              contentPadding: new EdgeInsets.fromLTRB(10.0, 30.0, 10.0, 10.0),
+              border: new OutlineInputBorder(
+                borderRadius: new BorderRadius.circular(12.0),
+              ),
             ),
-          ),
             keyboardType: TextInputType.multiline,
             maxLines: 5,
             controller: bioController,
