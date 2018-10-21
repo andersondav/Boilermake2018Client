@@ -55,6 +55,8 @@ class _MyHomePageState extends State<MyHomePage> {
         context: context,
         hint: 'Enter the area that you live in...');
 
+    print("Done with google");
+
     var loc = (await dataFromPlaceID(p.placeId)).loc;
 
     Navigator.push(

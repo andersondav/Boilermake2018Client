@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:latlong/latlong.dart';
 
 import 'util.dart';
+import 'helper_profile.dart';
 
 class LookerScreen extends StatelessWidget {
   LookerScreen({this.loc});
@@ -49,6 +50,16 @@ class _HelperItemState extends State<_HelperItem> {
   double distance = -1.0;
   String locationName;
 
+  _goToProfile() {
+    print('switching...');
+//    WidgetsBinding.instance.addPostFrameCallback((_) async {
+//      Navigator.push(
+//          context,
+//          MaterialPageRoute(
+//              builder: (context) => new HelperProfile()));
+//    });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -63,11 +74,13 @@ class _HelperItemState extends State<_HelperItem> {
         this.locationName = data.name;
       });
     });
+
   }
 
   @override
   Widget build(BuildContext context) {
     return new ListTile(
+      onLongPress: _goToProfile(),
         leading: Container(
             width: 50.0,
             height: 50.0,
@@ -77,9 +90,9 @@ class _HelperItemState extends State<_HelperItem> {
                     fit: BoxFit.fill,
                     image: NetworkImage(
                         widget.document.data["profile_pic"] + "?sz=50")))),
-        title: new Text(widget.document['name']),
+        title: Text(widget.document['name']),
         subtitle:
-            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
           Row(children: [
             Text(widget.document['skills']),
             Text(
