@@ -27,15 +27,25 @@ class _ManageAccountState extends State<ManageAccount> {
       body: Center(
         child: Container(
           padding: EdgeInsets.all(15.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: ListView(
+            //crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               _EditSkillsArea(
                 initState: document['skills'],
                 user: widget.user,
               ),
-              Divider(),
-              _DeleteAccountButton(user: widget.user)
+              Divider(
+                height: 10.0
+              ),
+              _EditBioArea(
+                initState: document['bio'],
+                user: widget.user,
+              ),
+              Divider(
+                  height: 10.0
+              ),
+              _DeleteAccountButton(user: widget.user),
+
             ],
           ),
         ),
@@ -116,12 +126,68 @@ class _EditSkillsArea extends StatelessWidget {
     return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Text('Skills'),
+          Text('Skills',
+              style: TextStyle(
+                fontSize: 20.0,
+              )
+          ),
           TextFormField(
             controller: skillsController,
           ),
           RaisedButton(
             child: Text('Save Skills'),
+            onPressed: () => _saveSkills(context),
+          ),
+        ]);
+  }
+}
+
+class _EditBioArea extends StatelessWidget {
+  _EditBioArea({initState: String, this.user})
+      : bioController = TextEditingController(text: initState);
+
+  final TextEditingController bioController;
+  final FirebaseUser user;
+
+  void _saveSkills(BuildContext context) async {
+    await Firestore.instance
+        .collection('helpers')
+        .document(user.email.toLowerCase())
+        .setData({'bio': bioController.text}, merge: true);
+
+    Scaffold.of(context).showSnackBar(new SnackBar(
+      content: new Text("Bio Saved"),
+    ));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text('Bio',
+          style: TextStyle(
+            fontSize: 20.0,
+          )
+          ),
+          Container(
+            height: 10.0,
+          ),
+          TextFormField(
+            // ignore: argument_type_not_assignable
+          decoration: new InputDecoration(
+            filled: true,
+            contentPadding: new EdgeInsets.fromLTRB(10.0, 30.0, 10.0, 10.0),
+            border: new OutlineInputBorder(
+            borderRadius: new BorderRadius.circular(12.0),
+            ),
+          ),
+            keyboardType: TextInputType.multiline,
+            maxLines: 10,
+            controller: bioController,
+          ),
+          RaisedButton(
+            child: Text('Save Bio'),
             onPressed: () => _saveSkills(context),
           ),
         ]);

@@ -89,7 +89,7 @@ class _AcctCreationState extends State<AcctCreation> {
                   style: new TextStyle(color: Colors.white),
                   textAlign: TextAlign.center,
                 ),
-                new Container(
+                new Divider(
                   height: 20.0,
                 ),
                 new Text(
@@ -100,7 +100,7 @@ class _AcctCreationState extends State<AcctCreation> {
                   ),
                   textAlign: TextAlign.center,
                 ),
-                new Container(
+                new Divider(
                   height: 20.0,
                 ),
                 new TextFormField(
@@ -118,7 +118,7 @@ class _AcctCreationState extends State<AcctCreation> {
                     ),
                   ),
                 ),
-                new Container(
+                new Divider(
                   height: 20.0,
                 ),
                 new Text(
@@ -129,7 +129,7 @@ class _AcctCreationState extends State<AcctCreation> {
                   ),
                   textAlign: TextAlign.center,
                 ),
-                new Container(
+                new Divider(
                   height: 20.0,
                 ),
                 new TextFormField(
@@ -149,20 +149,27 @@ class _AcctCreationState extends State<AcctCreation> {
                     ),
                   ),
                 ),
-                new Container(
+                new Divider(
                   height: 30.0,
                 ),
                 // ignore: list_element_type_not_assignable
                 FlatButton(
                   child: Row(children: [
                     Icon(Icons.map),
-                    Text(location != null
-                        ? location.description
-                        : 'Pick a location')
+                    Flexible(
+                      child: Container(
+                          child: Text(location != null
+                              ? location.description
+                              : 'Pick a location',
+                            overflow: TextOverflow.ellipsis,
+                          )
+                      )
+                    ),
                   ]),
                   onPressed: () => _getLoc(context),
                 ),
-                new Container(
+
+                new Divider(
                   height: 20.0,
                 ),
                 ButtonTheme(
