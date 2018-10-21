@@ -1,24 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_google_places_autocomplete/flutter_google_places_autocomplete.dart';
 
 import 'manage_acct.dart';
 import 'util.dart';
-
-final GoogleSignIn _googleSignIn = GoogleSignIn();
-final FirebaseAuth _auth = FirebaseAuth.instance;
-
-Future<FirebaseUser> _handleSignIn() async {
-  GoogleSignInAccount googleUser = await _googleSignIn.signIn();
-  GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-  FirebaseUser user = await _auth.signInWithGoogle(
-    accessToken: googleAuth.accessToken,
-    idToken: googleAuth.idToken,
-  );
-  return user;
-}
 
 // Define a Custom Form Widget
 class AcctCreation extends StatefulWidget {
@@ -201,7 +187,7 @@ class _AcctCreationState extends State<AcctCreation> {
 
     () async {
       // start logging in
-      FirebaseUser user = await _handleSignIn();
+      FirebaseUser user = await handleSignIn();
       DocumentSnapshot document = await Firestore.instance
           .collection('helpers')
           .document(user.email.toLowerCase())

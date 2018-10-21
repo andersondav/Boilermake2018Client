@@ -7,9 +7,10 @@ import 'util.dart';
 import 'helper_profile.dart';
 
 class LookerScreen extends StatelessWidget {
-  LookerScreen({this.loc});
+  LookerScreen({this.loc, this.user});
 
   final LatLng loc;
+  final FirebaseUser user;
 
   Widget build(BuildContext context) {
     return new Scaffold(
@@ -28,7 +29,11 @@ class LookerScreen extends StatelessWidget {
                 return new ListView(
                   children:
                       snapshot.data.documents.map((DocumentSnapshot document) {
-                    return _HelperItem(loc: loc, document: document);
+                    return _HelperItem(
+                      loc: loc,
+                      document: document,
+                      user: user,
+                    );
                   }).toList(),
                 );
             }
@@ -55,10 +60,11 @@ class _HelperItemState extends State<_HelperItem> {
   _goToProfile() {
     print('switching...');
 
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => new HelperProfile(user: widget.user, document: widget.document)));
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => new HelperProfile(
+                user: widget.user, document: widget.document)));
   }
 
   @override
@@ -75,13 +81,12 @@ class _HelperItemState extends State<_HelperItem> {
         this.locationName = data.name;
       });
     });
-
   }
 
   @override
   Widget build(BuildContext context) {
     return new ListTile(
-      onTap: _goToProfile,
+        onTap: _goToProfile,
         leading: Container(
             width: 50.0,
             height: 50.0,
@@ -93,7 +98,7 @@ class _HelperItemState extends State<_HelperItem> {
                         widget.document.data["profile_pic"] + "?sz=50")))),
         title: Text(widget.document['name']),
         subtitle:
-        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
           Row(children: [
             Text(widget.document['skills']),
             Text(

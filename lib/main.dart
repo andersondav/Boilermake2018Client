@@ -1,27 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_google_places_autocomplete/flutter_google_places_autocomplete.dart';
 
 import 'util.dart';
 import 'looking.dart';
 import 'create_acct.dart';
 
-final GoogleSignIn _googleSignIn = GoogleSignIn();
-final FirebaseAuth _auth = FirebaseAuth.instance;
-
 void main() => runApp(new MyApp());
-
-Future<FirebaseUser> _handleSignIn() async {
-  GoogleSignInAccount googleUser = await _googleSignIn.signIn();
-  GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-  FirebaseUser user = await _auth.signInWithGoogle(
-    accessToken: googleAuth.accessToken,
-    idToken: googleAuth.idToken,
-  );
-  print("signed in " + user.displayName);
-  return user;
-}
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
@@ -59,9 +44,13 @@ class _MyHomePageState extends State<MyHomePage> {
 
     var loc = (await dataFromPlaceID(p.placeId)).loc;
 
+    // login
+    FirebaseUser user = await handleSignIn();
+
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => new LookerScreen(loc: loc)),
+      MaterialPageRoute(
+          builder: (context) => new LookerScreen(loc: loc, user: user)),
     );
   }
 
@@ -134,16 +123,6 @@ class InitialOptions extends StatelessWidget {
 
   Widget build(BuildContext context) {
     _setColor();
-    Future<FirebaseUser> _handleSignIn() async {
-      GoogleSignInAccount googleUser = await _googleSignIn.signIn();
-      GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-      FirebaseUser user = await _auth.signInWithGoogle(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
-      print("signed in " + user.displayName);
-      return user;
-    }
 
     return new RaisedButton(
         child: Text(this.text,
