@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class ChatScreen extends StatelessWidget {
   ChatScreen({this.helper, this.helpee, this.isHelper});
@@ -18,27 +17,34 @@ class ChatScreen extends StatelessWidget {
             .collection('helpers')
             .document(helper.toLowerCase())
             .collection(helpee.toLowerCase())
-            .orderBy('sent')
+            .orderBy('sent', descending: true)
             .snapshots(),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.hasError) return new Text('Error: ${snapshot.error}');
           switch (snapshot.connectionState) {
-            case ConnectionState.waiting:
-              return new Text('Loading...');
+            // case ConnectionState.waiting:
+            //   return new Text('Loading...');
             default:
               return Stack(children: [
                 Container(
                     height: MediaQuery.of(context).size.height - 130.0,
                     width: MediaQuery.of(context).size.width,
                     child: ListView(
-                      children: snapshot.data.documents.map(
-                        (DocumentSnapshot document) {
-                          return _Message(
-                              text: document["text"],
-                              me: (isHelper && document["from"] == helper) ||
-                                  (!isHelper && document["from"] == helpee));
-                        },
-                      ).toList(),
+                      reverse: true,
+                      shrinkWrap: true,
+                      children:
+                          snapshot.connectionState == ConnectionState.waiting
+                              ? []
+                              : snapshot.data.documents.map(
+                                  (DocumentSnapshot document) {
+                                    return _Message(
+                                        text: document["text"],
+                                        me: (isHelper &&
+                                                document["from"] == helper) ||
+                                            (!isHelper &&
+                                                document["from"] == helpee));
+                                  },
+                                ).toList(),
                     )),
                 Container(
                     alignment: Alignment.bottomCenter,
