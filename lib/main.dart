@@ -51,7 +51,9 @@ class _MyHomePageState extends State<MyHomePage> {
   void _getHelp() async {
     // get the location
     Prediction p = await showGooglePlacesAutocomplete(
-        apiKey: MAPS_API_KEY, context: context);
+        apiKey: MAPS_API_KEY,
+        context: context,
+        hint: 'Enter the area that you live in...');
 
     var loc = (await dataFromPlaceID(p.placeId)).loc;
 

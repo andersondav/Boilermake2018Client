@@ -68,12 +68,24 @@ class _HelperItemState extends State<_HelperItem> {
   @override
   Widget build(BuildContext context) {
     return new ListTile(
-        leading: Image.network(widget.document.data["profile_pic"] + "?sz=64"),
+        leading: Container(
+            width: 50.0,
+            height: 50.0,
+            decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                image: DecorationImage(
+                    fit: BoxFit.fill,
+                    image: NetworkImage(
+                        widget.document.data["profile_pic"] + "?sz=50")))),
         title: new Text(widget.document['name']),
         subtitle:
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-          Text(widget.document['skills'] +
-              ' ${distance == -1 ? "Loading distance..." : '$distance miles'}'),
+          Row(children: [
+            Text(widget.document['skills']),
+            Text(
+                ' ${distance == -1 ? "Loading distance..." : '$distance miles'}',
+                style: TextStyle(fontStyle: FontStyle.italic))
+          ]),
           Container(
               width: 100.0,
               child: Text(
