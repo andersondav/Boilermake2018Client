@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:latlong/latlong.dart';
+
+import 'util.dart';
 
 class LookerScreen extends StatelessWidget {
+  LookerScreen({this.loc});
+
+  final LatLng loc;
+
   Widget build(BuildContext context) {
     return new Scaffold(
         appBar: new AppBar(
@@ -17,19 +24,61 @@ class LookerScreen extends StatelessWidget {
                 return new Text('Loading...');
               default:
                 return new ListView(
-
                   children:
                       snapshot.data.documents.map((DocumentSnapshot document) {
-                    return new ListTile(
-                      leading: Image.network(
-                          document.data["profile_pic"] + "?sz=64"),
-                      title: new Text(document['name']),
-                      subtitle: new Text(document['skills']),
-                    );
+                    return _HelperItem(loc: loc, document: document);
                   }).toList(),
                 );
             }
           },
         ));
+  }
+}
+
+class _HelperItem extends StatefulWidget {
+  _HelperItem({this.loc, this.document});
+
+  final LatLng loc;
+  final DocumentSnapshot document;
+
+  @override
+  _HelperItemState createState() => _HelperItemState();
+}
+
+class _HelperItemState extends State<_HelperItem> {
+  double distance = -1.0;
+  String locationName;
+
+  @override
+  void initState() {
+    super.initState();
+
+    dataFromPlaceID(widget.document["location"]).then((data) {
+      var distance = Distance();
+
+      var miles = distance.as(LengthUnit.Mile, data.loc, widget.loc);
+
+      setState(() {
+        this.distance = miles;
+        this.locationName = data.name;
+      });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return new ListTile(
+        leading: Image.network(widget.document.data["profile_pic"] + "?sz=64"),
+        title: new Text(widget.document['name']),
+        subtitle:
+            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+          Text(widget.document['skills'] +
+              ' ${distance == -1 ? "Loading distance..." : '$distance miles'}'),
+          Container(
+              width: 100.0,
+              child: Text(
+                  this.locationName == null ? "Loading..." : this.locationName,
+                  overflow: TextOverflow.ellipsis))
+        ]));
   }
 }

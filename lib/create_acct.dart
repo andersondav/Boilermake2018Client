@@ -5,11 +5,10 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_google_places_autocomplete/flutter_google_places_autocomplete.dart';
 
 import 'manage_acct.dart';
+import 'util.dart';
 
 final GoogleSignIn _googleSignIn = GoogleSignIn();
 final FirebaseAuth _auth = FirebaseAuth.instance;
-
-const MAPS_API_KEY = 'AIzaSyDx51vyR0IGRSrrtD9FVS6HVQOLWeRzGQ0';
 
 Future<FirebaseUser> _handleSignIn() async {
   GoogleSignInAccount googleUser = await _googleSignIn.signIn();
@@ -104,9 +103,7 @@ class _AcctCreationState extends State<AcctCreation> {
                   height: 20.0,
                 ),
                 new TextFormField(
-                  style: TextStyle(
-                    color: Colors.black
-                  ),
+                  style: TextStyle(color: Colors.black),
                   controller: skillsController,
                   decoration: new InputDecoration(
                     fillColor: Colors.white,
@@ -133,9 +130,7 @@ class _AcctCreationState extends State<AcctCreation> {
                   height: 20.0,
                 ),
                 new TextFormField(
-                  style: TextStyle(
-                      color: Colors.black
-                  ),
+                  style: TextStyle(color: Colors.black),
                   keyboardType: TextInputType.multiline,
                   maxLines: 10,
                   controller: bioController,

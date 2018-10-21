@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flutter_google_places_autocomplete/flutter_google_places_autocomplete.dart';
 
+import 'util.dart';
 import 'looking.dart';
 import 'create_acct.dart';
 
@@ -29,8 +30,9 @@ class MyApp extends StatelessWidget {
     return new MaterialApp(
       title: 'Flutter Demo',
       theme: new ThemeData(
-          brightness: Brightness.dark,
-          primarySwatch: Colors.blue, ),
+        brightness: Brightness.dark,
+        primarySwatch: Colors.blue,
+      ),
       home: new MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
@@ -46,12 +48,17 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  void _askingForHelp() {
-    print("TODO: insert transition to list of helpers");
-    Firestore.instance.collection('helpers').snapshots().forEach(
-        (QuerySnapshot a) => a.documents
-            .toList()
-            .forEach((DocumentSnapshot a) => print(a.data["name"])));
+  void _getHelp() async {
+    // get the location
+    Prediction p = await showGooglePlacesAutocomplete(
+        apiKey: MAPS_API_KEY, context: context);
+
+    var loc = (await dataFromPlaceID(p.placeId)).loc;
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => new LookerScreen(loc: loc)),
+    );
   }
 
   @override
@@ -80,14 +87,7 @@ class _MyHomePageState extends State<MyHomePage> {
               minWidth: 200.0,
               height: 100.0,
               child: InitialOptions(
-                  text: 'Looking for help',
-                  handleFunc: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => new LookerScreen()),
-                    );
-                  }),
+                  text: 'Looking for help', handleFunc: _getHelp),
             ),
             new Container(
               height: 20.0,
