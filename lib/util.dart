@@ -15,7 +15,7 @@ class LocationData {
 Future<LocationData> dataFromPlaceID(String placeID) async {
   // get the lat+long of p
   var response = await http.get(
-      'https://maps.googleapis.com/maps/api/place/details/json?placeid=${placeID}&key=$MAPS_API_KEY');
+      'https://maps.googleapis.com/maps/api/place/details/json?placeid=$placeID&key=$MAPS_API_KEY');
   var json = jsonDecode(response.body);
 
   var result = json["result"];
