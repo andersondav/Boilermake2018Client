@@ -82,54 +82,52 @@ class _ManageAccountState extends State<ManageAccount> {
                 .snapshots(),
             builder:
                 (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+              List<Widget> children = new List<Widget>();
+
+              children = <Widget>[
+                _EditSkillsArea(
+                  initState: document['skills'],
+                  user: widget.user,
+                ),
+                Divider(height: 10.0),
+                _EditBioArea(
+                  initState: document['bio'],
+                  user: widget.user,
+                ),
+                Divider(height: 10.0),
+                FlatButton(
+                  child: Row(children: [
+                    Icon(Icons.map),
+                    Flexible(
+                        child: Container(
+                            child: Text(
+                      location != null ? location.description : locationName,
+                      overflow: TextOverflow.ellipsis,
+                    ))),
+                  ]),
+                  onPressed: () => _getLoc(context),
+                ),
+                Divider(
+                  height: 10.0,
+                ),
+                _DeleteAccountButton(user: widget.user),
+              ];
+
+              if (snapshot.connectionState != ConnectionState.waiting) {
+                children
+                    .addAll(snapshot.data.documents.map((DocumentSnapshot doc) {
+                  Widget w = ListTile(
+                      onTap: () => _openChat(doc.documentID),
+                      title: Container(
+                          padding: EdgeInsets.all(20.0),
+                          child: Text(doc.documentID)));
+                  return w;
+                }));
+              }
+
               return ListView(
                 //crossAxisAlignment: CrossAxisAlignment.start,
-                children: snapshot.connectionState == ConnectionState.waiting
-                    ? List<Widget>()
-                    : <Widget>[
-                          Text(
-                            'Chats',
-                            style: TextStyle(fontSize: 20.0),
-                          )
-                        ] +
-                        snapshot.data.documents.map((DocumentSnapshot doc) {
-                          Widget w = ListTile(
-                              onTap: () => _openChat(doc.documentID),
-                              title: Container(
-                                  padding: EdgeInsets.all(20.0),
-                                  child: Text(doc.documentID)));
-                          return w;
-                        }).toList()
-                  ..addAll(<Widget>[
-                    _EditSkillsArea(
-                      initState: document['skills'],
-                      user: widget.user,
-                    ),
-                    Divider(height: 10.0),
-                    _EditBioArea(
-                      initState: document['bio'],
-                      user: widget.user,
-                    ),
-                    Divider(height: 10.0),
-                    FlatButton(
-                      child: Row(children: [
-                        Icon(Icons.map),
-                        Flexible(
-                            child: Container(
-                                child: Text(
-                          location != null
-                              ? location.description
-                              : locationName,
-                          overflow: TextOverflow.ellipsis,
-                        ))),
-                      ]),
-                      onPressed: () => _getLoc(context),
-                    ),
-                    Divider(
-                      height: 10.0,
-                    ),
-                    _DeleteAccountButton(user: widget.user),
-                  ]),
+                children: children,
               );
             },
           ),
