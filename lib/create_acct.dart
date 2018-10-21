@@ -29,6 +29,7 @@ class AcctCreation extends StatefulWidget {
 class _AcctCreationState extends State<AcctCreation> {
   FirebaseUser user;
   Prediction location;
+  bool valid = false;
 
   void _getLoc(BuildContext context) async {
     Prediction pre = await showGooglePlacesAutocomplete(
@@ -63,6 +64,14 @@ class _AcctCreationState extends State<AcctCreation> {
   // of the TextField!
   final skillsController = TextEditingController();
   final bioController = TextEditingController();
+
+  void setValidity() {
+    setState(() {
+      valid = skillsController.text.isNotEmpty &&
+          bioController.text.isNotEmpty &&
+          location != null;
+    });
+  }
 
   Widget _buildLoading() {
     return new Scaffold(
@@ -152,14 +161,13 @@ class _AcctCreationState extends State<AcctCreation> {
                   child: Row(children: [
                     Icon(Icons.map),
                     Flexible(
-                      child: Container(
-                          child: Text(location != null
-                              ? location.description
-                              : 'Pick a location',
-                            overflow: TextOverflow.ellipsis,
-                          )
-                      )
-                    ),
+                        child: Container(
+                            child: Text(
+                      location != null
+                          ? location.description
+                          : 'Pick a location',
+                      overflow: TextOverflow.ellipsis,
+                    ))),
                   ]),
                   onPressed: () => _getLoc(context),
                 ),
@@ -173,7 +181,7 @@ class _AcctCreationState extends State<AcctCreation> {
                   child: RaisedButton(
                     splashColor: Colors.grey,
                     color: Colors.blue,
-                    onPressed: _sendData,
+                    onPressed: valid ? _sendData : null,
                     child: new Text('Submit',
                         style: new TextStyle(
                           fontSize: 30.0,
@@ -191,6 +199,9 @@ class _AcctCreationState extends State<AcctCreation> {
   @override
   void initState() {
     super.initState();
+
+    skillsController.addListener(setValidity);
+    bioController.addListener(setValidity);
 
     () async {
       // start logging in
