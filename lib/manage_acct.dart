@@ -1,6 +1,10 @@
+import 'package:boilermake2018/util.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_google_places_autocomplete/flutter_google_places_autocomplete.dart';
+
+import 'create_acct.dart';
 
 class ManageAccount extends StatefulWidget {
   ManageAccount({this.user});
@@ -13,6 +17,40 @@ class ManageAccount extends StatefulWidget {
 
 class _ManageAccountState extends State<ManageAccount> {
   DocumentSnapshot document;
+  Prediction location;
+  String locationName = 'loading...';
+
+  void initState() {
+    super.initState();
+
+
+    Firestore.instance
+        .collection('helpers')
+        .document(widget.user.email.toLowerCase())
+        .get()
+        .then((document) {
+
+        this.setState(() => this.document = document);
+
+      dataFromPlaceID(document["location"]).then((data) {
+        setState(() {
+          this.locationName = data.name;
+        });
+      });
+    });
+  }
+
+  void _getLoc(BuildContext context) async {
+    Prediction pre = await showGooglePlacesAutocomplete(
+        apiKey: MAPS_API_KEY, context: context);
+
+    await Firestore.instance
+        .collection('helpers')
+        .document(widget.user.email.toLowerCase())
+        .setData({'location': pre.placeId}, merge: true);
+
+    setState(() => location = pre);
+  }
 
   Widget _buildLoading() {
     return new Scaffold(
@@ -44,6 +82,23 @@ class _ManageAccountState extends State<ManageAccount> {
               Divider(
                   height: 10.0
               ),
+              FlatButton(
+                child: Row(children: [
+                  Icon(Icons.map),
+                  Flexible(
+                      child: Container(
+                          child: Text(
+                            location != null
+                                ? location.description
+                                : locationName,
+                            overflow: TextOverflow.ellipsis,
+                          ))),
+                ]),
+                onPressed: () => _getLoc(context),
+              ),
+              Divider(
+                height: 10.0,
+              ),
               _DeleteAccountButton(user: widget.user),
 
             ],
@@ -51,17 +106,6 @@ class _ManageAccountState extends State<ManageAccount> {
         ),
       ),
     );
-  }
-
-  @override
-  void initState() {
-    super.initState();
-
-    Firestore.instance
-        .collection('helpers')
-        .document(widget.user.email.toLowerCase())
-        .get()
-        .then((document) => this.setState(() => this.document = document));
   }
 
   @override
@@ -183,7 +227,7 @@ class _EditBioArea extends StatelessWidget {
             ),
           ),
             keyboardType: TextInputType.multiline,
-            maxLines: 10,
+            maxLines: 5,
             controller: bioController,
           ),
           RaisedButton(
