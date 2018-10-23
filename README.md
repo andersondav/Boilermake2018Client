@@ -1,8 +1,7 @@
-# boilermake2018
+# TechSupportMatcher
 
-A new Flutter application.
+An iOS and Android App that enables people who requrie assistance with technology to find people to help them, and also allows those looking to help others with technology connect with those seeking help.
 
-## Getting Started
+## Frameworks and Languages Used
 
-For help getting started with Flutter, view our online
-[documentation](https://flutter.io/).
+Flutter, Dart, Google Firebase
